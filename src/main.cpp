@@ -1,47 +1,43 @@
+#include "config.h"
 #include "log.h"
-#include "raylib.h"
-#include <argumentum/argparse-h.h>
+#include <cstdlib>
 #include <fmt/core.h>
 #include <raylib-cpp.hpp>
+#include <raylib.h>
 #include <string_view>
 
-constexpr int DEFAULT_SCREEN_WIDTH = 800;
-constexpr int DEFAULT_SCREEN_HEIGHT = 600;
-constexpr int DEFAULT_TARGET_FPS = 60;
 
 void UpdateDrawFrame(raylib::Window&);
 
 int main(int argc, char** argv) {
-  auto args = argumentum::argument_parser();
-  auto params = args.params();
+  auto config_result = core::Config::create_from_args(argc, argv);
+  if (!config_result) {
+    using Error = core::Config::Error;
+    switch (config_result.error()) {
+      case Error::HelpShown:
+        log::debug("Help screen shown");
+        break;
+      case Error::InvalidArguments:
+        log::error("Invalid arguments given");
+        break;
+      case Error::Unknown:
+        log::error("Unknown error occurred");
+        break;
+    }
+    return EXIT_FAILURE;
+  }
 
-  int screen_width;
-  params.add_parameter(screen_width, "-w", "--width")
-          .required(false)
-          .default_value(DEFAULT_SCREEN_WIDTH)
-          .maxargs(1);
-  int screen_height;
-  params.add_parameter(screen_height, "-h", "--height")
-          .required(false)
-          .default_value(DEFAULT_SCREEN_HEIGHT)
-          .maxargs(1);
-  int target_fps;
-  params.add_parameter(target_fps, "-f", "--target-fps")
-          .required(false)
-          .default_value(DEFAULT_TARGET_FPS)
-          .maxargs(1);
-  args.add_default_help_option();
-  args.parse_args(argc, argv);
+  auto config = config_result.value();
 
-  log::info("Creating window with {:d}x{:d}@{:d}", screen_width, screen_height, target_fps);
-  raylib::Window window(screen_width, screen_height, "Raygame");
+  fmt::print("Creating window with {:d}x{:d}@{:d}", config.screen_width(), config.screen_height(), config.target_fps());
+  raylib::Window window(config.screen_width(), config.screen_height(), "Raygame");
 
-  SetTargetFPS(target_fps);
+  SetTargetFPS(config.target_fps());
   while (!window.ShouldClose()) {
     UpdateDrawFrame(window);
   }
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 void UpdateDrawFrame(raylib::Window& window) {

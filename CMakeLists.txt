@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 project(raygame)
 
 include(FetchContent)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
 
 FetchContent_Declare(
@@ -33,7 +33,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Argumentum)
 
-set(SOURCES src/main.cpp)
+set(SOURCES 
+    src/main.cpp
+    src/config.cpp
+)
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wshadow -pedantic)
 target_link_libraries(${PROJECT_NAME} 
