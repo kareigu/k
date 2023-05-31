@@ -1,14 +1,13 @@
 #include "core/assert.h"
 #include "core/config.h"
 #include "log.h"
+#include "renderer.h"
 #include <cstdlib>
 #include <fmt/core.h>
 #include <raylib-cpp.hpp>
 #include <raylib.h>
 #include <string_view>
 
-
-void UpdateDrawFrame(raylib::Window&);
 
 int main(int argc, char** argv) {
   auto config_result = core::Config::create_from_args(argc, argv);
@@ -30,20 +29,14 @@ int main(int argc, char** argv) {
 
   auto config = config_result.value();
 
-  log::info("Creating window with {:d}x{:d}@{:d}", config.screen_width(), config.screen_height(), config.target_fps());
-  raylib::Window window(config.screen_width(), config.screen_height(), "Raygame");
+  gfx::Renderer renderer(config);
+  auto render_loop_result = renderer.run_render_loop();
 
-  SetTargetFPS(config.target_fps());
-  while (!window.ShouldClose()) {
-    UpdateDrawFrame(window);
+  switch (render_loop_result) {
+    case gfx::Renderer::ExitResult::Ok:
+      return EXIT_SUCCESS;
+    case gfx::Renderer::ExitResult::UnknownError:
+      log::error("Unknown error occurred");
+      return EXIT_FAILURE;
   }
-
-  return EXIT_SUCCESS;
-}
-
-void UpdateDrawFrame(raylib::Window& window) {
-  window.BeginDrawing();
-  ClearBackground(BLACK);
-  raylib::Text(fmt::format("{:d} fps | {:f} ms", window.GetFPS(), window.GetFrameTime()), 30, RAYWHITE, ::GetFontDefault(), 2.0f).Draw(190, 200);
-  window.EndDrawing();
 }

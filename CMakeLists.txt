@@ -37,6 +37,7 @@ set(SOURCES
     src/main.cpp
     src/core/config.cpp
     src/core/assert.cpp
+    src/renderer.cpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wshadow -pedantic)
