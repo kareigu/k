@@ -35,7 +35,8 @@ FetchContent_MakeAvailable(Argumentum)
 
 set(SOURCES 
     src/main.cpp
-    src/config.cpp
+    src/core/config.cpp
+    src/core/assert.cpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wshadow -pedantic)

@@ -1,5 +1,4 @@
 #include "config.h"
-#include <__expected/unexpected.h>
 #include <argumentum/argparse-h.h>
 
 namespace core {

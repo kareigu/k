@@ -1,4 +1,5 @@
-#include "config.h"
+#include "core/assert.h"
+#include "core/config.h"
 #include "log.h"
 #include <cstdlib>
 #include <fmt/core.h>
@@ -15,7 +16,7 @@ int main(int argc, char** argv) {
     using Error = core::Config::Error;
     switch (config_result.error()) {
       case Error::HelpShown:
-        log::debug("Help screen shown");
+        log::debug("Help screen shown {:d}", 5);
         break;
       case Error::InvalidArguments:
         log::error("Invalid arguments given");
@@ -29,7 +30,7 @@ int main(int argc, char** argv) {
 
   auto config = config_result.value();
 
-  fmt::print("Creating window with {:d}x{:d}@{:d}", config.screen_width(), config.screen_height(), config.target_fps());
+  log::info("Creating window with {:d}x{:d}@{:d}", config.screen_width(), config.screen_height(), config.target_fps());
   raylib::Window window(config.screen_width(), config.screen_height(), "Raygame");
 
   SetTargetFPS(config.target_fps());
