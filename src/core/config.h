@@ -2,6 +2,10 @@
 #include <expected>
 #include <string>
 
+namespace gfx {
+class Renderer;
+}
+
 namespace core {
 constexpr int DEFAULT_SCREEN_WIDTH = 800;
 constexpr int DEFAULT_SCREEN_HEIGHT = 600;
@@ -29,9 +33,20 @@ public:
   int screen_width() const { return resolution().width; }
   int screen_height() const { return resolution().height; }
   int target_fps() const { return resolution().target_fps; }
+  bool debug() const { return m_debug_view; }
+
+  void set_debug(bool enabled = true) { m_debug_view = enabled; }
 
 private:
   Config() = default;
   Resolution m_resolution{};
+#ifndef NDEBUG
+  bool m_debug_view = true;
+#else
+  bool m_debug_view = false;
+#endif
+
+
+  friend class gfx::Renderer;
 };
 }// namespace core

@@ -17,6 +17,9 @@ public:
   ExitResult run_render_loop() noexcept;
 
 private:
+  void draw_debug_ui();
+
   std::unique_ptr<raylib::Window> m_window;
+  core::Config m_config;
 };
 }// namespace gfx
