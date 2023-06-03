@@ -3,7 +3,15 @@ project(raygame)
 
 include(FetchContent)
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    add_compile_options(-diagnostics-color=always)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    add_compile_options(-fcolor-diagnostics)
+endif()
+
+if(WIN32)
+    add_compile_options(-fansi-escape-codes)
+endif()
 
 FetchContent_Declare(
     raylib
