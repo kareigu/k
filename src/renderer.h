@@ -11,6 +11,14 @@ public:
     UnknownError,
   };
 
+  struct State {
+    struct CameraOffset {
+      float x = 0.0f;
+      float y = 0.0f;
+    };
+    CameraOffset camera_offset;
+  };
+
   Renderer(const core::Config config) noexcept;
   ~Renderer() = default;
 
@@ -21,5 +29,6 @@ private:
 
   std::unique_ptr<raylib::Window> m_window;
   core::Config m_config;
+  State m_state;
 };
 }// namespace gfx
