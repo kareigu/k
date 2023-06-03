@@ -3,6 +3,7 @@ project(raygame)
 
 include(FetchContent)
 set(CMAKE_CXX_STANDARD 23)
+set(GRAPHICS GRAPHICS_API_OPENGL_ES2)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     add_compile_options(-diagnostics-color=always)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
