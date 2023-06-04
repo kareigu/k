@@ -24,23 +24,14 @@ ExitResult Renderer::run_render_loop() noexcept {
 
     auto mouse_pos = raylib::Vector2(GetMousePosition());
 
-    if (IsKeyDown(KEY_DOWN))
-      m_state.camera_offset.y -= 0.4f;
-    if (IsKeyDown(KEY_UP))
-      m_state.camera_offset.y += 0.4f;
-    if (IsKeyDown(KEY_LEFT))
-      m_state.camera_offset.x += 0.4f;
-    if (IsKeyDown(KEY_RIGHT))
-      m_state.camera_offset.x -= 0.4f;
-
     m_window->BeginDrawing();
     ClearBackground(BLACK);
 
     for (int y = 0; y < render_height; y += tile_size) {
       for (int x = 0; x < render_width; x += tile_size) {
         auto rect = raylib::Rectangle(
-                x + m_state.camera_offset.x,
-                y + m_state.camera_offset.y,
+                x + m_state.camera_offset().x,
+                y + m_state.camera_offset().y,
                 tile_size,
                 tile_size);
         bool hovered = mouse_pos.CheckCollision(rect);
@@ -69,5 +60,12 @@ void Renderer::draw_debug_ui() {
           2.0f)
           .Draw(190, 200);
   m_window->DrawFPS();
+}
+
+using State = Renderer::State;
+void State::update_camera_offset(std::function<void(CameraOffset&)> update_fn) {
+  m_mutex.lock();
+  update_fn(m_camera_offset);
+  m_mutex.unlock();
 }
 }// namespace gfx
