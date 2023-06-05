@@ -65,25 +65,26 @@ namespace input {
     }
   }
 
-  bool Handler::handle_inputs(gfx::Renderer::State& state, long long time_diff) {
+  bool Handler::handle_inputs(gfx::Renderer::State& state, float time_diff) {
+    constexpr float MOVE_MULTIPLIER = 18.0f;
     bool input_handled = false;
     gfx::Renderer::State::CameraOffset new_offset;
     for (const auto& action : m_action_queue) {
       switch (action) {
         case Action::Up:
-          new_offset.y += 0.4f / time_diff;
+          new_offset.y += MOVE_MULTIPLIER * time_diff;
           input_handled = true;
           break;
         case Action::Down:
-          new_offset.y -= 0.4f / time_diff;
+          new_offset.y -= MOVE_MULTIPLIER * time_diff;
           input_handled = true;
           break;
         case Action::Left:
-          new_offset.x += 0.4f / time_diff;
+          new_offset.x += MOVE_MULTIPLIER * time_diff;
           input_handled = true;
           break;
         case Action::Right:
-          new_offset.x -= 0.4f / time_diff;
+          new_offset.x -= MOVE_MULTIPLIER * time_diff;
           input_handled = true;
           break;
         case Action::Confirm:
@@ -98,8 +99,6 @@ namespace input {
       }
     }
     if (new_offset.x != 0.0f || new_offset.y != 0.0f) {
-      log::info("new_offset {{ .x = {:f}, .y = {:f} }}", new_offset.x, new_offset.y);
-
       state.update_camera_offset([new_offset](auto& offset) {
         offset.x += new_offset.x;
         offset.y += new_offset.y;

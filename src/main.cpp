@@ -39,16 +39,19 @@ int main(int argc, char** argv) {
   std::jthread input_thread([&stop_input_thread, &renderer] {
     core::input::Handler input_handler;
 
-    auto prev_time = std::chrono::system_clock::now().time_since_epoch().count();
-    while (!stop_input_thread) {
-      auto time_now = std::chrono::system_clock::now().time_since_epoch().count();
-      auto time_diff = time_now - prev_time;
+    typedef std::chrono::high_resolution_clock Time;
+    typedef std::chrono::duration<float> fsec;
 
-      if (time_diff == 0)
+    auto prev_time = Time::now();
+    while (!stop_input_thread) {
+      auto time_now = Time::now();
+      fsec time_diff = time_now - prev_time;
+
+      if (time_diff.count() == 0.0f)
         continue;
 
       input_handler.process_inputs();
-      bool input_handled = input_handler.handle_inputs(renderer.state(), time_diff);
+      bool input_handled = input_handler.handle_inputs(renderer.state(), time_diff.count());
       prev_time = time_now;
 
       if (!input_handled)

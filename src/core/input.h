@@ -61,7 +61,7 @@ namespace input {
     auto& bindings_manager() { return m_bindings; }
 
     void process_inputs();
-    bool handle_inputs(gfx::Renderer::State& state, long long time_diff);
+    bool handle_inputs(gfx::Renderer::State& state, float time_diff);
 
     void add_to_action_queue(Action action);
 
