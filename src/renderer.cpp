@@ -1,22 +1,24 @@
 #include "renderer.h"
 #include "core/assert.h"
+#include "gfx/tiles.h"
 #include "log.h"
+#include "raylib.h"
 #include <fmt/core.h>
 
 
 namespace gfx {
-constexpr unsigned int DEBUG_TEXT_COLOUR = 0x00ff7eff;
 
 Renderer::Renderer(const core::Config config) noexcept {
   m_config = std::move(config);
   log::info("Creating window with {:d}x{:d}@{:d}", m_config.screen_width(), m_config.screen_height(), m_config.target_fps());
-  m_window = std::make_unique<raylib::Window>(m_config.screen_width(), m_config.screen_height(), "Raygame");
+  m_window = std::make_unique<raylib::Window>(m_config.screen_width(), m_config.screen_height(), "kiikkupaska 2");
   m_window->SetTargetFPS(m_config.target_fps());
 }
 
 using ExitResult = Renderer::ExitResult;
 ExitResult Renderer::run_render_loop() noexcept {
   ASSERT(m_window != nullptr, "No window");
+  tiles::Map tilemap;
   while (!m_window->ShouldClose()) {
     int render_width = m_window->GetRenderWidth();
     int render_height = m_window->GetRenderHeight();
@@ -27,15 +29,16 @@ ExitResult Renderer::run_render_loop() noexcept {
     m_window->BeginDrawing();
     ClearBackground(BLACK);
 
-    for (int y = 0; y < render_height; y += tile_size) {
-      for (int x = 0; x < render_width; x += tile_size) {
+    for (size_t y = 0; y < tiles::MAP_SIZE; y++) {
+      for (size_t x = 0; x < tiles::MAP_SIZE; x++) {
         auto rect = raylib::Rectangle(
-                x + m_state.camera_offset().x,
-                y + m_state.camera_offset().y,
+                x * tile_size + m_state.camera_offset().x,
+                y * tile_size + m_state.camera_offset().y,
                 tile_size,
                 tile_size);
         bool hovered = mouse_pos.CheckCollision(rect);
-        rect.Draw(::Color(x, hovered ? 100 : 0, y, 255));
+        auto colour = tilemap.tiles()[x * y].colour();
+        rect.Draw(hovered ? GREEN : colour);
         if (m_config.debug())
           rect.DrawLines(::Color(255, 255, 255, 100));
       }
@@ -52,13 +55,25 @@ ExitResult Renderer::run_render_loop() noexcept {
 
 
 void Renderer::draw_debug_ui() {
+  constexpr int X_POS = 10;
+  constexpr unsigned int DEBUG_TEXT_COLOUR = 0xffff7eff;
+
+  auto screen_width = m_window->GetRenderWidth();
+  auto screen_height = m_window->GetRenderHeight();
   raylib::Text(
-          fmt::format("{:d} fps | {:f} ms", m_window->GetFPS(), m_window->GetFrameTime()),
+          fmt::format("MAP_SIZE = {:d}x{:d}", tiles::MAP_SIZE, tiles::MAP_SIZE),
           30,
           raylib::Color(DEBUG_TEXT_COLOUR),
           ::GetFontDefault(),
           2.0f)
-          .Draw(190, 200);
+          .Draw(X_POS, 60);
+  raylib::Text(
+          fmt::format("camera_offset = {{ .x = {:f}, .y = {:f} }}", m_state.camera_offset().x, m_state.camera_offset().y),
+          30,
+          raylib::Color(DEBUG_TEXT_COLOUR),
+          ::GetFontDefault(),
+          2.0f)
+          .Draw(X_POS, 80);
   m_window->DrawFPS();
 }
 

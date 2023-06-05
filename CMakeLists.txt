@@ -48,6 +48,7 @@ set(SOURCES
     src/core/input.cpp
     src/core/assert.cpp
     src/renderer.cpp
+    src/gfx/tiles.cpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wshadow -pedantic)
