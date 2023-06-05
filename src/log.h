@@ -1,8 +1,8 @@
 #pragma once
-#include "raylib.h"
 #include <fmt/compile.h>
 #include <fmt/core.h>
 #include <raylib-cpp.hpp>
+#include <raylib.h>
 
 namespace log {
 template<typename... T>

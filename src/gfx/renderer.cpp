@@ -2,8 +2,8 @@
 #include "core/assert.h"
 #include "gfx/tiles.h"
 #include "log.h"
-#include "raylib.h"
 #include <fmt/core.h>
+#include <raylib.h>
 
 
 namespace gfx {

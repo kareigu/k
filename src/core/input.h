@@ -1,9 +1,10 @@
 #pragma once
-#include "../renderer.h"
-#include "raylib.h"
+#include "gfx/renderer.h"
 #include <map>
 #include <optional>
 #include <raylib-cpp.hpp>
+#include <raylib.h>
+
 
 
 namespace core {

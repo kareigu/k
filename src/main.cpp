@@ -1,8 +1,8 @@
 #include "core/assert.h"
 #include "core/config.h"
 #include "core/input.h"
+#include "gfx/renderer.h"
 #include "log.h"
-#include "renderer.h"
 #include <atomic>
 #include <chrono>
 #include <cstdlib>

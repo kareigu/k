@@ -1,7 +1,7 @@
 #include "input.h"
-#include "../log.h"
+#include "log.h"
 #include "assert.h"
-#include "raylib.h"
+#include <raylib.h>
 #include <stdexcept>
 
 
