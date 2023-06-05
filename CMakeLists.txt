@@ -45,6 +45,7 @@ FetchContent_MakeAvailable(Argumentum)
 set(SOURCES 
     src/main.cpp
     src/core/config.cpp
+    src/core/input.cpp
     src/core/assert.cpp
     src/renderer.cpp
 )
