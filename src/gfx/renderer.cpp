@@ -31,9 +31,17 @@ ExitResult Renderer::run_render_loop() noexcept {
 
     for (size_t y = 0; y < tiles::MAP_SIZE; y++) {
       for (size_t x = 0; x < tiles::MAP_SIZE; x++) {
+        auto x_pos = x * tile_size + m_state.camera_offset().x;
+        auto y_pos = y * tile_size + m_state.camera_offset().y;
+
+        if (x_pos < 0.0f && y_pos < 0.0f)
+          continue;
+        if (x_pos > render_width && y_pos > render_height)
+          continue;
+
         auto rect = raylib::Rectangle(
-                x * tile_size + m_state.camera_offset().x,
-                y * tile_size + m_state.camera_offset().y,
+                x_pos,
+                y_pos,
                 tile_size,
                 tile_size);
         bool hovered = mouse_pos.CheckCollision(rect);
