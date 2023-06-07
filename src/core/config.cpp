@@ -3,7 +3,7 @@
 
 namespace core {
 using Error = Config::Error;
-std::expected<Config, Error> Config::create_from_args(int argc, char** argv) {
+cpp::result<Config, Error> Config::create_from_args(int argc, char** argv) {
   Config config{};
   auto args = argumentum::argument_parser();
   auto params = args.params();
@@ -28,11 +28,11 @@ std::expected<Config, Error> Config::create_from_args(int argc, char** argv) {
     return config;
 
   if (result.help_was_shown())
-    return std::unexpected(Error::HelpShown);
+    return cpp::fail(Error::HelpShown);
 
   if (result.errors_were_shown())
-    return std::unexpected(Error::InvalidArguments);
+    return cpp::fail(Error::InvalidArguments);
 
-  return std::unexpected(Error::Unknown);
+  return cpp::fail(Error::Unknown);
 }
 }// namespace core

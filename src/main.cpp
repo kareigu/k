@@ -14,9 +14,11 @@
 
 
 int main(int argc, char** argv) {
+  log::info("Reading configuration");
   auto config_result = core::Config::create_from_args(argc, argv);
   if (!config_result) {
     using Error = core::Config::Error;
+    log::info("Test {:d}", (int) config_result.error());
     switch (config_result.error()) {
       case Error::HelpShown:
         log::debug("Help screen shown {:d}", 5);
@@ -27,16 +29,21 @@ int main(int argc, char** argv) {
       case Error::Unknown:
         log::error("Unknown error occurred");
         break;
+      default:
+        log::error("Unhandled error case while reading configuration: {:d}", (int) config_result.error());
+        break;
     }
+    log::error("Exiting");
     return EXIT_FAILURE;
   }
+  log::info("Configuration read successfully");
 
   auto config = config_result.value();
 
   gfx::Renderer renderer(config);
 
   std::atomic_bool stop_input_thread = false;
-  std::jthread input_thread([&stop_input_thread, &renderer] {
+  std::thread input_thread([&stop_input_thread, &renderer] {
     core::input::Handler input_handler;
 
     typedef std::chrono::high_resolution_clock Time;

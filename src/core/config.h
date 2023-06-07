@@ -1,5 +1,6 @@
 #pragma once
 #include <expected>
+#include <result.hpp>
 #include <string>
 
 namespace gfx {
@@ -26,7 +27,7 @@ public:
     Unknown,
   };
 
-  static std::expected<Config, Error> create_from_args(int argc, char** argv);
+  static cpp::result<Config, Error> create_from_args(int argc, char** argv);
   ~Config() = default;
 
   Resolution resolution() const { return m_resolution; }

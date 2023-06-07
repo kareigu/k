@@ -42,6 +42,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Argumentum)
 
+FetchContent_Declare(
+    Result
+    GIT_REPOSITORY https://github.com/bitwizeshift/result.git
+    GIT_TAG v1.0.0
+)
+FetchContent_MakeAvailable(Result)
+
 include_directories(src/)
 set(SOURCES 
     src/main.cpp
@@ -59,5 +66,6 @@ target_link_libraries(${PROJECT_NAME}
     raylib_cpp 
     fmt
     Argumentum::headers
+    Result
 )
 
