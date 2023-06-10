@@ -1,5 +1,7 @@
 #include "core/assert.h"
 #include "core/config.h"
+#include "core/game_loop.h"
+#include "core/game_state.h"
 #include "core/input.h"
 #include "gfx/renderer.h"
 #include "log.h"
@@ -7,6 +9,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <fmt/core.h>
+#include <memory>
 #include <raylib-cpp.hpp>
 #include <raylib.h>
 #include <string_view>
@@ -40,36 +43,15 @@ int main(int argc, char** argv) {
 
   auto config = config_result.value();
 
-  gfx::Renderer renderer(config);
+  auto game_state = std::make_shared<core::GameState>();
+  core::GameLoop game_loop(game_state);
 
-  std::atomic_bool stop_input_thread = false;
-  std::thread input_thread([&stop_input_thread, &renderer] {
-    core::input::Handler input_handler;
+  gfx::Renderer renderer(config, game_state);
 
-    typedef std::chrono::high_resolution_clock Time;
-    typedef std::chrono::duration<float> fsec;
-
-    auto prev_time = Time::now();
-    while (!stop_input_thread) {
-      auto time_now = Time::now();
-      fsec time_diff = time_now - prev_time;
-
-      if (time_diff.count() == 0.0f)
-        continue;
-
-      input_handler.process_inputs();
-      bool input_handled = input_handler.handle_inputs(renderer.state(), time_diff.count());
-      prev_time = time_now;
-
-      if (!input_handled)
-        std::this_thread::sleep_for(std::chrono::microseconds(200));
-    }
-  });
+  game_loop.start_game_loop_thread();
   auto render_loop_result = renderer.run_render_loop();
 
-  stop_input_thread = true;
-  input_thread.join();
-
+  game_loop.stop_game_loop_thread();
   switch (render_loop_result) {
     case gfx::Renderer::ExitResult::Ok:
       return EXIT_SUCCESS;

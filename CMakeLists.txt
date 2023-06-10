@@ -4,6 +4,12 @@ project(raygame)
 include(FetchContent)
 set(CMAKE_CXX_STANDARD 23)
 set(GRAPHICS GRAPHICS_API_OPENGL_ES2)
+
+if(WIN32)
+    set(CC clang)
+    set(CXX clang++)
+endif()
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     add_compile_options(-diagnostics-color=always)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -55,6 +61,8 @@ set(SOURCES
     src/core/config.cpp
     src/core/input.cpp
     src/core/assert.cpp
+    src/core/game_state.cpp
+    src/core/game_loop.cpp
     src/gfx/renderer.cpp
     src/gfx/tiles.cpp
 )

@@ -1,10 +1,10 @@
 #pragma once
+#include "core/game_state.h"
 #include "gfx/renderer.h"
 #include <map>
 #include <optional>
 #include <raylib-cpp.hpp>
 #include <raylib.h>
-
 
 
 namespace core {
@@ -62,7 +62,7 @@ namespace input {
     auto& bindings_manager() { return m_bindings; }
 
     void process_inputs();
-    bool handle_inputs(gfx::Renderer::State& state, float time_diff);
+    bool handle_inputs(core::GameState& state, float time_diff);
 
     void add_to_action_queue(Action action);
 

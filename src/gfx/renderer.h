@@ -1,5 +1,6 @@
 #pragma once
 #include "core/config.h"
+#include "core/game_state.h"
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -28,7 +29,7 @@ public:
     CameraOffset m_camera_offset;
   };
 
-  Renderer(const core::Config config) noexcept;
+  Renderer(const core::Config config, std::shared_ptr<core::GameState> game_state) noexcept;
   ~Renderer() = default;
 
   ExitResult run_render_loop() noexcept;
@@ -40,6 +41,8 @@ private:
 
   std::unique_ptr<raylib::Window> m_window;
   core::Config m_config;
+
   State m_state;
+  std::shared_ptr<core::GameState> m_game_state;
 };
 }// namespace gfx

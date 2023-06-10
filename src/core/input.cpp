@@ -1,6 +1,6 @@
 #include "input.h"
-#include "log.h"
 #include "assert.h"
+#include "log.h"
 #include <raylib.h>
 #include <stdexcept>
 
@@ -65,7 +65,7 @@ namespace input {
     }
   }
 
-  bool Handler::handle_inputs(gfx::Renderer::State& state, float time_diff) {
+  bool Handler::handle_inputs(core::GameState& state, float time_diff) {
     constexpr float MOVE_MULTIPLIER = 18.0f;
     bool input_handled = false;
     gfx::Renderer::State::CameraOffset new_offset;
@@ -99,7 +99,7 @@ namespace input {
       }
     }
     if (new_offset.x != 0.0f || new_offset.y != 0.0f) {
-      state.update_camera_offset([new_offset](auto& offset) {
+      state.player_pos().update_position([new_offset](auto& offset) {
         offset.x += new_offset.x;
         offset.y += new_offset.y;
       });
