@@ -1,6 +1,8 @@
 #pragma once
 #include <Color.hpp>
+#include <Vector2.hpp>
 #include <array>
+
 
 namespace gfx {
 namespace tiles {
@@ -15,25 +17,27 @@ namespace tiles {
       Wood,
     };
 
-    enum class Position {
+    enum class Height {
       Ground,
       Wall,
       Ceiling,
     };
 
-    Tile();
-    Tile(Type, Position);
-    Tile(Type);
-    Tile(Position);
+    Tile() = default;
+    Tile(raylib::Vector2);
+    Tile(raylib::Vector2, Type, Height);
+    Tile(raylib::Vector2, Type);
+    Tile(raylib::Vector2, Height);
 
     ~Tile() = default;
 
     Type type() const { return m_type; }
-    Position position() const { return m_position; }
+    Height height() const { return m_height; }
+    raylib::Vector2 position() const { return m_position; }
 
     void set_type(Type);
-    void set_position(Position);
-    void set_data(Type, Position);
+    void set_height(Height);
+    void set_data(Type, Height);
 
 
     [[nodiscard]] raylib::Color colour() const { return m_colour; };
@@ -42,8 +46,9 @@ namespace tiles {
     void update_colour();
 
     Type m_type = Type::Stone;
-    Position m_position = Position::Ground;
+    Height m_height = Height::Ground;
     raylib::Color m_colour = raylib::Color(10, 10, 10);
+    raylib::Vector2 m_position;
   };
 
   class Map {
@@ -52,6 +57,8 @@ namespace tiles {
     ~Map() = default;
 
     const auto& tiles() const { return m_tilemap; }
+
+    const auto& operator()() const { return m_tilemap; }
 
   private:
     std::array<Tile, MAP_SIZE * MAP_SIZE> m_tilemap;

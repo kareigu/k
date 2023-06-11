@@ -4,16 +4,17 @@
 
 namespace gfx {
 namespace tiles {
-  Tile::Tile() {
+  Tile::Tile(raylib::Vector2 position) : m_position(position) {
     update_colour();
   }
-  Tile::Tile(Type type, Position position) : m_type(type), m_position(position) {
+  Tile::Tile(raylib::Vector2 position, Type type, Height height)
+      : m_type(type), m_height(height), m_position(position) {
     update_colour();
   }
-  Tile::Tile(Type type) : m_type(type) {
+  Tile::Tile(raylib::Vector2 position, Type type) : m_type(type), m_position(position) {
     update_colour();
   }
-  Tile::Tile(Position position) : m_position(position) {
+  Tile::Tile(raylib::Vector2 position, Height height) : m_height(height), m_position(position) {
     update_colour();
   }
 
@@ -25,20 +26,20 @@ namespace tiles {
     update_colour();
   }
 
-  void Tile::set_position(Position position) {
-    if (position == m_position)
+  void Tile::set_height(Height height) {
+    if (height == m_height)
       return;
 
-    m_position = position;
+    m_height = height;
     update_colour();
   }
 
-  void Tile::set_data(Type type, Position position) {
-    if (type == m_type && position == m_position)
+  void Tile::set_data(Type type, Height height) {
+    if (type == m_type && height == m_height)
       return;
 
     m_type = type;
-    m_position = position;
+    m_height = height;
     update_colour();
   }
 
@@ -63,13 +64,13 @@ namespace tiles {
         break;
     }
 
-    switch (m_position) {
-      case Position::Ground:
+    switch (m_height) {
+      case Height::Ground:
         break;
-      case Position::Wall:
+      case Height::Wall:
         colour.AlphaBlend(::Color(20, 20, 20), ::Color(20, 20, 20));
         break;
-      case Position::Ceiling:
+      case Height::Ceiling:
         colour.AlphaBlend(::Color(50, 50, 50), ::Color(50, 50, 50));
         break;
     }
@@ -79,8 +80,13 @@ namespace tiles {
 
   Map::Map() {
     SetRandomSeed(std::chrono::system_clock().now().time_since_epoch().count());
-    for (auto& tile : m_tilemap) {
-      tile.set_data(static_cast<Tile::Type>(GetRandomValue(0, 3)), static_cast<Tile::Position>(GetRandomValue(0, 2)));
+    for (long long y = -(MAP_SIZE / 2); y < static_cast<long long>(MAP_SIZE / 2); y++) {
+      for (long long x = -(MAP_SIZE / 2); x < static_cast<long long>(MAP_SIZE / 2); x++) {
+        Tile tile(raylib::Vector2(x, y));
+        tile.set_data(static_cast<Tile::Type>(GetRandomValue(0, 3)), static_cast<Tile::Height>(GetRandomValue(0, 2)));
+        size_t index = (y + MAP_SIZE / 2) * MAP_SIZE + (x + MAP_SIZE / 2);
+        m_tilemap[index] = tile;
+      }
     }
   }
 }// namespace tiles

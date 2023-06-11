@@ -66,7 +66,7 @@ namespace input {
   }
 
   bool Handler::handle_inputs(core::GameState& state, float time_diff) {
-    constexpr float MOVE_MULTIPLIER = 18.0f;
+    constexpr float MOVE_MULTIPLIER = 4.0f;
     bool input_handled = false;
     gfx::Renderer::State::CameraOffset new_offset;
     for (const auto& action : m_action_queue) {
