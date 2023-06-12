@@ -2,6 +2,7 @@
 #include "core/game_state.h"
 #include "core/input.h"
 #include <memory>
+#include <thread>
 
 
 namespace core {
