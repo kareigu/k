@@ -58,14 +58,25 @@ ExitResult Renderer::run_render_loop() noexcept {
       }
     }
 
-    auto player_sprite = raylib::Rectangle(screen_center_width, screen_center_height, tile_size, tile_size);
+    auto player_sprite_size = tile_size * 0.8f;
+    auto player_sprite_diff_from_center = tile_size - player_sprite_size;
+    auto player_sprite = raylib::Rectangle(
+            screen_center_width + player_sprite_diff_from_center,
+            screen_center_height + player_sprite_diff_from_center,
+            player_sprite_size,
+            player_sprite_size);
     player_sprite.DrawRounded(10.0f, 8, ::Color(255, 0, 120, 255));
 
     if (m_config.debug()) {
       draw_debug_ui();
       if (debug_hovered_tile) {
         raylib::Text(
-                fmt::format("x = {:f}\ny = {:f}", debug_hovered_tile->position().x, debug_hovered_tile->position().y),
+                fmt::format(
+                        "x = {:f}\ny = {:f}\ntype = {:d}\nheight = {:d}",
+                        debug_hovered_tile->position().x,
+                        debug_hovered_tile->position().y,
+                        static_cast<size_t>(debug_hovered_tile->type()),
+                        static_cast<size_t>(debug_hovered_tile->height())),
                 10.0f,
                 raylib::Color(DEBUG_TEXT_COLOUR))
                 .Draw(::Vector2(mouse_pos.x + 20.0f, mouse_pos.y));

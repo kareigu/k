@@ -59,6 +59,7 @@ namespace tiles {
     const auto& tiles() const { return m_tilemap; }
 
     const auto& operator()() const { return m_tilemap; }
+    const Tile& operator()(raylib::Vector2 pos) const;
 
   private:
     std::array<Tile, MAP_SIZE * MAP_SIZE> m_tilemap;

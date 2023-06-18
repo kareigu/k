@@ -68,23 +68,23 @@ namespace input {
   bool Handler::handle_inputs(core::GameState& state, float time_diff) {
     constexpr float MOVE_MULTIPLIER = 4.0f;
     bool input_handled = false;
-    gfx::Renderer::State::CameraOffset new_offset;
+    raylib::Vector2 position_offset;
     for (const auto& action : m_action_queue) {
       switch (action) {
         case Action::Up:
-          new_offset.y += MOVE_MULTIPLIER * time_diff;
+          position_offset.y += MOVE_MULTIPLIER * time_diff;
           input_handled = true;
           break;
         case Action::Down:
-          new_offset.y -= MOVE_MULTIPLIER * time_diff;
+          position_offset.y -= MOVE_MULTIPLIER * time_diff;
           input_handled = true;
           break;
         case Action::Left:
-          new_offset.x += MOVE_MULTIPLIER * time_diff;
+          position_offset.x += MOVE_MULTIPLIER * time_diff;
           input_handled = true;
           break;
         case Action::Right:
-          new_offset.x -= MOVE_MULTIPLIER * time_diff;
+          position_offset.x -= MOVE_MULTIPLIER * time_diff;
           input_handled = true;
           break;
         case Action::Confirm:
@@ -98,10 +98,28 @@ namespace input {
           break;
       }
     }
-    if (new_offset.x != 0.0f || new_offset.y != 0.0f) {
-      state.player_pos().update_position([new_offset](auto& offset) {
-        offset.x += new_offset.x;
-        offset.y += new_offset.y;
+    if (position_offset.x != 0.0f || position_offset.y != 0.0f) {
+      state.update_player_position([position_offset](const auto& map, auto& position) {
+        auto new_pos = position + position_offset;
+        for (const auto& tile : map()) {
+          auto tile_pos = tile.position();
+          if (!tile_pos.CheckCollision(new_pos, 1.0f))
+            continue;
+
+          if (tile.height() == gfx::tiles::Tile::Height::Wall) {
+            log::warn("Prevented moving to: {{ x = {:f}, y = {:f} }}", tile_pos.x, tile_pos.y);
+            return;
+          }
+        }
+        // const gfx::tiles::Tile& tile_under_new_position = map(position + position_offset);
+
+        // if (tile_under_new_position.height() == gfx::tiles::Tile::Height::Wall) {
+        //   auto tile_pos = tile_under_new_position.position();
+        //   log::warn("Prevented moving to: {{ x = {:f}, y = {:f} }}", tile_pos.x, tile_pos.y);
+        //   return;
+        // }
+
+        position = new_pos;
       });
     }
 

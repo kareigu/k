@@ -1,6 +1,9 @@
 #include "tiles.h"
+#include <FastNoise/FastNoise.h>
+#include <FastNoise/Generators/Fractal.h>
 #include <chrono>
 #include <raylib.h>
+
 
 namespace gfx {
 namespace tiles {
@@ -78,16 +81,58 @@ namespace tiles {
     m_colour = std::move(colour);
   }
 
+  static size_t calculate_index(long long x, long long y) {
+    return (y + MAP_SIZE / 2) * MAP_SIZE + (x + MAP_SIZE / 2);
+  };
+
   Map::Map() {
-    SetRandomSeed(std::chrono::system_clock().now().time_since_epoch().count());
+    auto seed = std::chrono::system_clock().now().time_since_epoch().count();
+    SetRandomSeed(seed);
+    auto simplex = FastNoise::New<FastNoise::Simplex>();
+    auto fractal = FastNoise::New<FastNoise::FractalFBm>();
+    fractal->SetSource(simplex);
+    fractal->SetOctaveCount(5);
+
+    std::array<float, MAP_SIZE * MAP_SIZE> noise_map;
+    fractal->GenUniformGrid2D(noise_map.data(), 0, 0, MAP_SIZE, MAP_SIZE, 0.2f, seed);
+
+    auto coordinates_to_tile_type = [&noise_map](long long x, long long y) -> Tile::Type {
+      using Type = Tile::Type;
+
+      float noise_value = noise_map[calculate_index(x, y)];
+
+
+      if (noise_value > 0.4f)
+        return Type::Wood;
+
+      if (noise_value > 0.04f && noise_value < 0.08f)
+        return Type::Stone;
+
+      if (noise_value > 0.02f)
+        return Type::Dirt;
+
+      return Type::Grass;
+    };
+
+
     for (long long y = -(MAP_SIZE / 2); y < static_cast<long long>(MAP_SIZE / 2); y++) {
       for (long long x = -(MAP_SIZE / 2); x < static_cast<long long>(MAP_SIZE / 2); x++) {
         Tile tile(raylib::Vector2(x, y));
-        tile.set_data(static_cast<Tile::Type>(GetRandomValue(0, 3)), static_cast<Tile::Height>(GetRandomValue(0, 2)));
-        size_t index = (y + MAP_SIZE / 2) * MAP_SIZE + (x + MAP_SIZE / 2);
+        Tile::Type tile_type = coordinates_to_tile_type(x, y);
+        bool is_wall = tile_type != Tile::Type::Dirt && tile_type != Tile::Type::Grass;
+        tile.set_data(tile_type, is_wall ? Tile::Height::Wall : Tile::Height::Ground);
+        size_t index = calculate_index(x, y);
         m_tilemap[index] = tile;
       }
     }
+  }
+
+  const Tile& Map::operator()(raylib::Vector2 pos) const {
+    long long x = pos.x;
+    long long y = pos.y;
+
+    size_t index = calculate_index(x, y);
+    return m_tilemap[index];
   }
 }// namespace tiles
 }// namespace gfx

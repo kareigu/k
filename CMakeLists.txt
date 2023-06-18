@@ -55,6 +55,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Result)
 
+FetchContent_Declare(
+    FastNoise2
+    GIT_REPOSITORY https://github.com/Auburn/FastNoise2.git
+    GIT_TAG v0.10.0-alpha
+)
+FetchContent_MakeAvailable(FastNoise2)
+
 include_directories(src/)
 set(SOURCES 
     src/main.cpp
@@ -75,5 +82,6 @@ target_link_libraries(${PROJECT_NAME}
     fmt
     Argumentum::headers
     Result
+    FastNoise2
 )
 

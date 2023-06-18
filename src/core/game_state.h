@@ -14,7 +14,7 @@ public:
     ~PlayerPos() = default;
     const raylib::Vector2& operator()() const { return m_pos; }
 
-    void update_position(std::function<void(raylib::Vector2& pos)>);
+    void update_position(const gfx::tiles::Map& map, std::function<void(const gfx::tiles::Map& map, raylib::Vector2& pos)>);
 
   private:
     std::mutex m_mutex;
@@ -23,6 +23,8 @@ public:
 
   PlayerPos& player_pos() { return m_player_pos; }
   const gfx::tiles::Map& map() const { return m_map; }
+
+  inline void update_player_position(std::function<void(const gfx::tiles::Map& map, raylib::Vector2& pos)> fn) { m_player_pos.update_position(m_map, fn); };
 
   GameState() = default;
   GameState(const GameState&) = delete;
