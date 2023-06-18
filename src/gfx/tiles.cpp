@@ -54,13 +54,13 @@ namespace tiles {
         colour = Color(10, 10, 10);
         break;
       case Type::Dirt:
-        colour = Color(96, 71, 12);
+        colour = Color(181, 131, 77);
         break;
       case Type::Grass:
         colour = Color(101, 173, 37);
         break;
       case Type::Wood:
-        colour = Color(181, 131, 77);
+        colour = Color(96, 71, 12);
         break;
       default:
         colour = Color(255, 0, 252);
