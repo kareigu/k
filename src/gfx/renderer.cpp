@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "RenderTexture.hpp"
 #include "Vector2.hpp"
 #include "core/assert.h"
 #include "gfx/tiles.h"
@@ -20,17 +21,32 @@ Renderer::Renderer(const core::Config config, std::shared_ptr<core::GameState> g
 using ExitResult = Renderer::ExitResult;
 ExitResult Renderer::run_render_loop() noexcept {
   ASSERT(m_window != nullptr, "No window");
+
+  constexpr uint8_t tile_size = 16;
+  constexpr uint8_t tiles_on_width = 12;
+  constexpr uint8_t tiles_on_height = 9;
+  constexpr uint16_t render_width = tile_size * tiles_on_width;
+  constexpr uint16_t render_height = tile_size * tiles_on_height;
+
+  auto render_texture = raylib::RenderTexture2D(render_width, render_height);
   while (!m_window->ShouldClose()) {
-    int render_width = m_window->GetRenderWidth();
-    int render_height = m_window->GetRenderHeight();
-    int tile_size = render_width / 12;
+    // int render_width = m_window->GetRenderWidth();
+    // int render_height = m_window->GetRenderHeight();
+    // int tile_size = render_width / 12;
+    int screen_width = m_window->GetWidth();
+    int screen_height = m_window->GetHeight();
+    float render_scale = std::min(screen_width / render_width, screen_height / render_height);
     int screen_center_width = render_width / 2 - tile_size / 2;
     int screen_center_height = render_height / 2 - tile_size / 2;
 
-    auto mouse_pos = raylib::Vector2(GetMousePosition());
+    raylib::Vector2 mouse_pos = raylib::Vector2(GetMousePosition());
+    raylib::Vector2 virtual_mouse_pos(
+            (mouse_pos.x - (screen_width - render_width * render_scale) * 0.5f) / render_scale,
+            (mouse_pos.y - (screen_height - render_height * render_scale) * 0.5f) / render_scale);
+    virtual_mouse_pos.Clamp({0.0f, 0.0f}, {render_width, render_height});
 
-    m_window->BeginDrawing();
-    ClearBackground(BLACK);
+    render_texture.BeginMode();
+    ClearBackground(::Color(PINK));
 
     ASSERT(m_game_state != nullptr, "m_game_state was nullptr");
     const auto& player_pos = m_game_state->player_pos();
@@ -39,17 +55,20 @@ ExitResult Renderer::run_render_loop() noexcept {
     const tiles::Tile* debug_hovered_tile = nullptr;
 
     for (const auto& tile : tilemap()) {
-      if (tile.position().Distance(player_pos()) > tile_size / 2.0f)
+      // if (tile.position().Distance(player_pos()) > tile_size / 2.0f)
+      //   continue;
+
+      float x_pos = screen_center_width + (-(tile.position().x - player_pos().x) * tile_size);
+      float y_pos = screen_center_height + (-(tile.position().y - player_pos().y) * tile_size);
+      if (x_pos < 0.0f || x_pos > render_width || y_pos < 0.0f || y_pos > render_height)
         continue;
 
-      auto x_pos = screen_center_width + (-(tile.position().x - player_pos().x) * tile_size);
-      auto y_pos = screen_center_height + (-(tile.position().y - player_pos().y) * tile_size);
       auto rect = raylib::Rectangle(
               x_pos,
               y_pos,
               tile_size,
               tile_size);
-      bool hovered = mouse_pos.CheckCollision(rect);
+      bool hovered = virtual_mouse_pos.CheckCollision(rect);
       rect.Draw(hovered ? GREEN : tile.colour());
       if (m_config.debug()) {
         rect.DrawLines(::Color(255, 255, 255, 100));
@@ -66,7 +85,21 @@ ExitResult Renderer::run_render_loop() noexcept {
             player_sprite_size,
             player_sprite_size);
     player_sprite.DrawRounded(10.0f, 8, ::Color(255, 0, 120, 255));
+    render_texture.EndMode();
 
+
+    m_window->BeginDrawing();
+    m_window->ClearBackground();
+    DrawTexturePro(
+            render_texture.GetTexture(),
+            {0.0f, 0.0f, render_width, -render_height},
+            {(screen_width - (render_width * render_scale)) * 0.5f,
+             (screen_height - (render_height * render_scale)) * 0.5f,
+             render_width * render_scale,
+             render_height * render_scale},
+            {0, 0},
+            0.0f,
+            WHITE);
     if (m_config.debug()) {
       draw_debug_ui();
       if (debug_hovered_tile) {

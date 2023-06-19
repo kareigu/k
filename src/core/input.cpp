@@ -103,11 +103,12 @@ namespace input {
         auto new_pos = position + position_offset;
         for (const auto& tile : map()) {
           auto tile_pos = tile.position();
-          if (!tile_pos.CheckCollision(new_pos, 1.0f))
+          auto distance = tile_pos.Distance(new_pos);
+          if (distance > 1.0f)
             continue;
 
           if (tile.height() == gfx::tiles::Tile::Height::Wall) {
-            log::warn("Prevented moving to: {{ x = {:f}, y = {:f} }}", tile_pos.x, tile_pos.y);
+            log::warn("Prevented moving to: {{ x = {:f}, y = {:f} }}, distance = {:f}", tile_pos.x, tile_pos.y, distance);
             return;
           }
         }
